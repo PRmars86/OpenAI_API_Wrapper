@@ -1,7 +1,6 @@
 import logging
-
-import azure.functions as func
 import openai
+import azure.functions as func
 import key
 
 secret_key = key.secret_key
@@ -13,17 +12,14 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     openai.api_key = secret_key
 
     req_body = req.get_json()
-    model = "text-davinci-003"
 
-    output = openai.Completion.create(
-        model = model,
+    output = openai.Image.create(
         prompt = req_body['prompt'],
-        max_tokens = 500,
-        temperature = req_body['temperature']
+        n = 2,
+        size = "1024x1024"
     )
 
-    output_text = output['choices'][0]['text']
+    output_url = output["data"][0]["url"]
 
-    return func.HttpResponse(output_text, status_code=200)
 
-    
+    return func.HttpResponse(output_url, status_code=200)

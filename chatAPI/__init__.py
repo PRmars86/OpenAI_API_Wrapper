@@ -1,29 +1,29 @@
 import logging
-
-import azure.functions as func
 import openai
+import azure.functions as func
 import key
 
 secret_key = key.secret_key
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
+
     logging.info('Python HTTP trigger function processed a request.')
 
     openai.organization = "org-azwR948N54GOXfw3iLG7nnHD"
     openai.api_key = secret_key
 
     req_body = req.get_json()
-    model = "text-davinci-003"
+    model = "gpt-3.5-turbo"
 
-    output = openai.Completion.create(
+    output = openai.ChatCompletion.create(
         model = model,
-        prompt = req_body['prompt'],
+        messages=[
+        {"role": "system", "content": req_body['prompt']},
+    ],
         max_tokens = 500,
-        temperature = req_body['temperature']
+        temperature = 0
     )
 
-    output_text = output['choices'][0]['text']
+    output_text = output['choices'][0]['message']['content']
 
     return func.HttpResponse(output_text, status_code=200)
-
-    
